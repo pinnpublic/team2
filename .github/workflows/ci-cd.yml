@@ -92,6 +92,7 @@ jobs:
             # 1. 위에서 scp로 파일을 복사한 디렉토리로 이동합니다.
             #   (이 경로는 scp-action의 'target' 경로와 일치해야 합니다)
             cd /home/ubuntu/my-project
+			echo DOCKER_USERNAME=${{ secrets.DOCKER_USERNAME }} > .env
             # 2. Build 단계에서 푸시한 최신 이미지를 PULL 받습니다.
             sudo docker pull ${{ secrets.DOCKER_USERNAME }}/team:latest
             # 3. docker-compose.yml을 기반으로 기존 컨테이너를 중지/삭제합니다.
