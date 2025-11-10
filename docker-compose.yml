@@ -1,6 +1,6 @@
 services:
   app:
-    image: ${DOCKER_USERNAME}/team:latest
+    image: ${{ secrets.DOCKER_USERNAME }}/team:latest
     container_name: team
     ports:
       - "8090:8090"
