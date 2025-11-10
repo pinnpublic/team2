@@ -28,6 +28,7 @@ services:
     restart: unless-stopped
     networks:
       - team-network
+	shm_size: '1g'
 
 networks:
   team-network:
