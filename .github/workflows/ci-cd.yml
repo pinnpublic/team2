@@ -90,7 +90,7 @@ jobs:
             key: ${{ secrets.EC2_SSH_KEY }}
             script: |
               # 1. 위에서 scp로 파일을 복사한 디렉토리로 이동합니다.
-              #    (이 경로는 scp-action의 'target' 경로와 일치해야 합니다)
+              #   (이 경로는 scp-action의 'target' 경로와 일치해야 합니다)
               cd /home/ubuntu/my-project
 
               # 2. Build 단계에서 푸시한 최신 이미지를 PULL 받습니다.
