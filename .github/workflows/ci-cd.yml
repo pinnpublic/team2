@@ -61,3 +61,46 @@ jobs:
         push: true
         tags: ${{ secrets.DOCKER_USERNAME }}/team:latest
 
+  deploy:
+    needs: build-and-deploy
+    runs-on: ubuntu-latest
+
+    steps:
+      # 1. 이 러너(Runner) 환경에 소스 코드를 체크아웃합니다.
+      # (docker-compose.yml 파일을 가져오기 위함)
+      - name: 코드 체크아웃
+        uses: actions/checkout@v3
+
+      # 2. scp를 사용해 docker-compose.yml 파일을 EC2 서버로 복사합니다.
+      - name: docker-compose.yml 파일 EC2에 복사
+        uses: appleboy/scp-action@master
+        with:
+          host: ${{ secrets.EC2_HOST }}
+          username: ${{ secrets.EC2_USER }}
+          key: ${{ secrets.EC2_SSH_KEY }}
+          source: "docker-compose.yml"  # <-- 프로젝트 루트의 docker-compose.yml
+          target: "/home/ubuntu/my-project" # <-- EC2 서버에 복사될 *디렉토리*
+
+        # 3. EC2에 SSH로 접속하여 배포 스크립트를 실행합니다.
+        - name: Deploy to EC2
+          uses: appleboy/ssh-action@master
+          with:
+            host: ${{ secrets.EC2_HOST }}
+            username: ${{ secrets.EC2_USER }}
+            key: ${{ secrets.EC2_SSH_KEY }}
+            script: |
+              # 1. 위에서 scp로 파일을 복사한 디렉토리로 이동합니다.
+              #    (이 경로는 scp-action의 'target' 경로와 일치해야 합니다)
+              cd /home/ubuntu/my-project
+
+              # 2. Build 단계에서 푸시한 최신 이미지를 PULL 받습니다.
+              sudo docker pull ${{ secrets.DOCKER_USERNAME }}/team:latest
+
+              # 3. docker-compose.yml을 기반으로 기존 컨테이너를 중지/삭제합니다.
+              sudo docker-compose down
+
+              # 4. docker-compose.yml을 기반으로 새 컨테이너를 백그라운드에서 시작합니다.
+              sudo docker-compose up -d
+
+              # 5. 사용하지 않는 Docker 이미지를 정리합니다.
+              sudo docker image prune -f
