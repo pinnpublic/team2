@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<head>
+	<meta charset="UTF-8">
+	<meta http-equiv="X-UA-Compatible" content="IE=edge">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>Title</title>
+	<link rel="stylesheet" href="http://bit.ly/3WJ5ilK">
+</head>
+<body class="narrow">
+	
+	<h1>Spring Boot <small>CI/CD</small></h1>
+	  
+	<table>
+        <tr>
+            <th>번호</th>
+            <th>팀</th>
+            <th>설명</th>
+        </tr>        
+        <tr th:each="entity : ${list}">
+            <td th:text="${entity.seq}"></td>
+            <td th:text="${entity.name}"></td>
+            <td th:text="${entity.description}" class="left"></td>
+        </tr>
+    </table>
+	  
+</body>
+</html>

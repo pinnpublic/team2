@@ -62,31 +62,39 @@ jobs:
         push: true
         tags: ${{ secrets.DOCKER_USERNAME }}/team:latest
 
-  deploy:
+deploy:
     needs: build-and-deploy
     runs-on: ubuntu-latest
 
     steps:
-      # EC2에 SSH 접속해서 배포
-      - name: Deploy to EC2
+      # 1. deploy 잡(job)에서도 코드를 체크아웃해야 합니다.
+      # (저장소 루트에 있는 docker-compose.yml 파일을 EC2로 보내기 위해)
+      - name: 코드 체크아웃
+        uses: actions/checkout@v3
+
+      # 2. scp 액션을 사용하여 docker-compose.yml 파일을 EC2로 전송
+      - name: docker-compose.yml 파일을 EC2로 복사
+        uses: appleboy/scp-action@master
+        with:
+          host: ${{ secrets.EC2_HOST }}
+          username: ${{ secrets.EC2_USER }}
+          key: ${{ secrets.EC2_SSH_KEY }}
+          source: "docker-compose.yml"  # <-- 저장소 루트에 있는 이 파일을
+          target: "/home/ec2-user/app"    # <-- EC2 서버의 이 경로로 전송
+
+      # 3. EC2에 SSH 접속해서 배포 (기존 스크립트)
+      - name: Deploy to EC2 by docker-compose
         uses: appleboy/ssh-action@master
         with:
           host: ${{ secrets.EC2_HOST }}
           username: ${{ secrets.EC2_USER }}
           key: ${{ secrets.EC2_SSH_KEY }}
           script: |
-            # 기존 컨테이너 중지 및 삭제
-            sudo docker stop myapp || true
-            sudo docker rm myapp || true
-
-            # 새 이미지 받기
-            sudo docker pull ${{ secrets.DOCKER_USERNAME }}/team:latest
-
-            # 새 컨테이너 실행
-            sudo docker run -d \
-              --name myapp \
-              -p 8090:8090 \
-              ${{ secrets.DOCKER_USERNAME }}/team:latest
-
-            # 안 쓰는 이미지 정리
-            sudo docker image prune -f
+            # 2번 단계에서 파일이 전송된 경로로 이동합니다.
+            cd /home/ec2-user/app
+            
+            # 이제 이 경로에 docker-compose.yml 파일이 있으므로 명령이 실행됩니다.
+            sudo docker-compose pull
+            sudo docker-compose down
+            sudo docker-compose up -d
+            sudo docker image prune -f  # (오타 수정)

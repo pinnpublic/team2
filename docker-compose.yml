@@ -1,0 +1,37 @@
+services:
+  app:
+    image: ${DOCKER_USERNAME}/team:latest
+    container_name: team
+    ports:
+      - "8090:8090"
+    environment:
+      - SPRING_DATASOURCE_URL=jdbc:oracle:thin:@oracle:1521/XEPDB1
+      - SPRING_DATASOURCE_USERNAME=springboot # 아래 오라클 유저 계정
+      - SPRING_DATASOURCE_PASSWORD=java1234
+    depends_on:
+      - oracle
+    restart: unless-stopped
+    networks:
+      - team-network
+
+  oracle:
+    image: gvenzl/oracle-xe:latest
+    container_name: oracle
+    ports:
+      - "1522:1521" # 로컬 오라클과 충돌 방지
+    environment:
+      - ORACLE_PASSWORD=java1234 # 관리자(SYS, SYSTEM) 계정
+      - APP_USER=springboot # 유저 계정
+      - APP_USER_PASSWORD=java1234
+    volumes:
+      - oracle-data:/opt/oracle/oradata
+    restart: unless-stopped
+    networks:
+      - team-network
+
+networks:
+  team-network:
+    driver: bridge
+
+volumes:
+  oracle-data:
