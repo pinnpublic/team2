@@ -1,0 +1,13 @@
+name: Hello
+
+on:
+  push:
+    branches: [ main ]
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+    steps:
+    - name: 실행 확인
+      run: |
+        echo "push가 발생하면 깃헙 액션을 실행합니다."
