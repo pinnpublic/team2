@@ -28,7 +28,6 @@ jobs:
         run: chmod +x ./gradlew
       - name: 단위 테스트 실행
         run: ./gradlew test --no-daemon
-        shell: cmd
       - name: 테스트 실패 시 이슈 생성하기
         if: failure()
         uses: JasonEtco/create-an-issue@v2
