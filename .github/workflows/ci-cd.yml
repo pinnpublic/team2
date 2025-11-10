@@ -95,8 +95,8 @@ jobs:
             # 2. Build 단계에서 푸시한 최신 이미지를 PULL 받습니다.
             sudo docker pull ${{ secrets.DOCKER_USERNAME }}/team:latest
             # 3. docker-compose.yml을 기반으로 기존 컨테이너를 중지/삭제합니다.
-            sudo docker-compose down
+            sudo docker compose down
             # 4. docker-compose.yml을 기반으로 새 컨테이너를 백그라운드에서 시작합니다.
-            sudo docker-compose up -d
+            sudo docker compose up -d
             # 5. 사용하지 않는 Docker 이미지를 정리합니다.
             sudo docker image prune -f
