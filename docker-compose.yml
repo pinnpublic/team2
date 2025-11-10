@@ -9,8 +9,7 @@ services:
       - SPRING_DATASOURCE_USERNAME=springboot # 아래 오라클 유저 계정
       - SPRING_DATASOURCE_PASSWORD=java1234
     depends_on:
-      oracle:
-        condition: service_healthy # <--- '컨테이너 시작'이 아닌 'healthcheck 성공'까지 기다림
+      - oracle
     restart: unless-stopped
     networks:
       - team-network
