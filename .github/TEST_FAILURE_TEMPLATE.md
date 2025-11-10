@@ -1,4 +1,4 @@
-title: "단위 테스트 실패 - ${{ env.GITHUB_RUN_ID }}"
+title: "단위 테스트 실패"
 assignees:
   - ${{ env.GITHUB_ACTOR }}
 labels:
