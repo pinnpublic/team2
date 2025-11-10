@@ -10,6 +10,7 @@ services:
       - SPRING_DATASOURCE_PASSWORD=java1234
     depends_on:
       - oracle
+	  condition: service_healthy
     restart: unless-stopped
     networks:
       - team-network
@@ -20,6 +21,11 @@ services:
     ports:
       - "1521:1521"
     shm_size: '1g'
+	healthcheck: # <-- (필수) 이 healthcheck 블록을 추가합니다.
+      test: ["CMD", "healthcheck.sh"]
+      interval: 10s # 10초마다 헬스체크
+      timeout: 5s   # 5초 내 응답
+      retries: 30 # 30번 재시도 (최대 5분간 기다림)
     environment:
       - ORACLE_PASSWORD=java1234 # 관리자(SYS, SYSTEM) 계정
       - APP_USER=springboot # 유저 계정
