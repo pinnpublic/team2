@@ -23,7 +23,7 @@ services:
     ports:
       - "1521:1521"
     shm_size: '1g'
-	healthcheck: # <-- (필수) 이 healthcheck 블록을 추가합니다.
+    healthcheck: # <-- (필수) 이 healthcheck 블록을 추가합니다.
       test: ["CMD", "healthcheck.sh"]
       interval: 10s # 10초마다 헬스체크
       timeout: 5s   # 5초 내 응답
