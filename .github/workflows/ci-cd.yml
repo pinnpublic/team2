@@ -4,6 +4,10 @@ on:
   push:
     branches: [ main ]
 
+permissions: 
+  contents: read 
+  issues: write	
+
 jobs:
   build-and-deploy:
     # runs-on: ubuntu-22.04 # 추후 변경
@@ -32,6 +36,15 @@ jobs:
     - name: 단위 테스트 실행
       run: ./gradlew test --no-daemon
       shell: cmd
+
+    - name: 테스트 실패 시 이슈 생성하기
+      if: failure()
+      uses: JasonEtco/create-an-issue@v2
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        filename: .github/TEST_FAILURE_TEMPLATE.md
+        assignees: ${{ github.actor }}
         
     - name: Gradle 빌드
       run: ./gradlew clean build
