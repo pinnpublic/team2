@@ -6,6 +6,6 @@ import org.springframework.stereotype.Repository;
 public class TestRepository {
 	public Integer num() {
 	
-		return 100;
+		return 200;
 	}
 }
