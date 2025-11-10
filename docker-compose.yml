@@ -34,7 +34,7 @@ services:
       - APP_USER_PASSWORD=java1234
     volumes:
       - oracle-data:/opt/oracle/oradata
-      - ./script:/container-entrypoint-initdb.d
+      - ./script.sql:/container-entrypoint-initdb.d/script.sql
     restart: unless-stopped
     networks:
       - team-network
