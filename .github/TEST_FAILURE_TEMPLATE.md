@@ -1,7 +1,7 @@
-title: 단위 테스트 실패 - {{ date | date('YYYY-MM-DD HH:mm') }}
-assignees: 
+title: "단위 테스트 실패 - ${{ env.GITHUB_RUN_ID }}"
+assignees:
   - ${{ env.GITHUB_ACTOR }}
-labels: 
+labels:
   - bug
   - test-failure
 ---
