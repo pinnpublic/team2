@@ -15,15 +15,13 @@ services:
       - team-network
 
   oracle:
-    image: gvenzl/oracle-xe:latest
+    image: oracle/database:18.4.0-xe
     container_name: oracle
     ports:
       - "1521:1521"
     shm_size: '1g'
     environment:
-      - ORACLE_PASSWORD=java1234
-      - APP_USER=springboot
-      - APP_USER_PASSWORD=java1234
+      - ORACLE_PWD=java1234
     volumes:
       - oracle-data:/opt/oracle/oradata
       - ./script.sql:/container-entrypoint-initdb.d/script.sql
