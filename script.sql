@@ -1,5 +1,3 @@
-ALTER SESSION SET CURRENT_SCHEMA=SPRINGBOOT;
-
 create table tblTeam (
     seq number primary key,
     name varchar2(100) not null unique,

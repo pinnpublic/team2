@@ -6,7 +6,7 @@ services:
       - "8090:8090"
     environment:
       - SPRING_DATASOURCE_URL=jdbc:oracle:thin:@oracle:1521/XEPDB1
-      - SPRING_DATASOURCE_USERNAME=springboot # 아래 오라클 유저 계정
+      - SPRING_DATASOURCE_USERNAME=springboot
       - SPRING_DATASOURCE_PASSWORD=java1234
     depends_on:
       - oracle
@@ -21,8 +21,8 @@ services:
       - "1521:1521"
     shm_size: '1g'
     environment:
-      - ORACLE_PASSWORD=java1234 # 관리자(SYS, SYSTEM) 계정
-      - APP_USER=springboot # 유저 계정
+      - ORACLE_PASSWORD=java1234
+      - APP_USER=springboot
       - APP_USER_PASSWORD=java1234
     volumes:
       - oracle-data:/opt/oracle/oradata
