@@ -77,6 +77,11 @@ jobs:
       # 1. deploy 러너에 소스 코드 체크아웃 (script.sql 등을 가져옴)
       - name: 코드 체크아웃
         uses: actions/checkout@v3
+        
+      - name: 산출물 다운로드
+        uses: actions/download-artifact@v4
+        with:
+          name: deploy-files
 
       # 2. [신규 추가] scp로 복사하기 전에 EC2에 디렉터리를 미리 생성함
       - name: EC2에 배포 디렉터리 생성
@@ -95,7 +100,9 @@ jobs:
           host: ${{ secrets.EC2_HOST }}
           username: ${{ secrets.EC2_USER }}
           key: ${{ secrets.EC2_SSH_KEY }}
-          source: "docker-compose.yml, script.sql"
+          source: |
+            docker-compose.yml
+            script.sql
           target: "/home/ubuntu/my-project" # <-- 이제 이 디렉터리가 존재함
 
       # 4. [기존 3번] 배포 스크립트 실행
