@@ -16,4 +16,6 @@ insert into tblTeam values (seqTeam.nextVal, '보안', '시스템의 보안을 �
 
 select * from tblTeam;
 
+SELECT * FROM ALL_USERS;
+
 commit;
