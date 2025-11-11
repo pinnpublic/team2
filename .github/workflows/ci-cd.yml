@@ -9,7 +9,7 @@ permissions:
   issues: write
 
 jobs:
-  build-and-deploy:
+  build:
     # runs-on: ubuntu-22.04 # 추후 변경
     runs-on: ubuntu-latest
     
@@ -61,27 +61,44 @@ jobs:
         push: true
         tags: ${{ secrets.DOCKER_USERNAME }}/team:latest
 
+    - name: 산출물 업로드
+      uses: actions/upload-artifact@v3
+      with:
+        name: deploy-files
+        path: |
+          docker-compose.yml
+          script.sql        
+        
   deploy:
-    needs: build-and-deploy
+    needs: build
     runs-on: ubuntu-latest
 
     steps:
-      # 1. 이 러너(Runner) 환경에 소스 코드를 체크아웃합니다.
-      # (docker-compose.yml 파일을 가져오기 위함)
+      # 1. deploy 러너에 소스 코드 체크아웃 (script.sql 등을 가져옴)
       - name: 코드 체크아웃
         uses: actions/checkout@v3
 
-      # 2. scp를 사용해 docker-compose.yml 파일을 EC2 서버로 복사합니다.
+      # 2. [신규 추가] scp로 복사하기 전에 EC2에 디렉터리를 미리 생성함
+      - name: EC2에 배포 디렉터리 생성
+        uses: appleboy/ssh-action@master
+        with:
+          host: ${{ secrets.EC2_HOST }}
+          username: ${{ secrets.EC2_USER }}
+          key: ${{ secrets.EC2_SSH_KEY }}
+          script: |
+            mkdir -p /home/ubuntu/my-project
+              
+      # 3. [기존 2번] 이제 디렉터리가 있으니 scp 복사 실행
       - name: docker-compose.yml 파일 EC2에 복사
         uses: appleboy/scp-action@master
         with:
           host: ${{ secrets.EC2_HOST }}
           username: ${{ secrets.EC2_USER }}
           key: ${{ secrets.EC2_SSH_KEY }}
-          source: "docker-compose.yml, script.sql"  # <-- 프로젝트 루트의 docker-compose.yml
-          target: "/home/ubuntu/my-project" # <-- EC2 서버에 복사될 *디렉토리*
+          source: "docker-compose.yml, script.sql"
+          target: "/home/ubuntu/my-project" # <-- 이제 이 디렉터리가 존재함
 
-      # 3. EC2에 SSH로 접속하여 배포 스크립트를 실행합니다.
+      # 4. [기존 3번] 배포 스크립트 실행
       - name: Deploy to EC2
         uses: appleboy/ssh-action@master
         with:
@@ -89,14 +106,13 @@ jobs:
           username: ${{ secrets.EC2_USER }}
           key: ${{ secrets.EC2_SSH_KEY }}
           script: |
-            # 1. 위에서 scp로 파일을 복사한 디렉토리로 이동합니다.
-            #   (이 경로는 scp-action의 'target' 경로와 일치해야 합니다)
+            # 1. 이제 이 디렉터리와 파일들이 존재함
             cd /home/ubuntu/my-project
             echo DOCKER_USERNAME=${{ secrets.DOCKER_USERNAME }} > .env
             # 2. Build 단계에서 푸시한 최신 이미지를 PULL 받습니다.
             sudo docker pull ${{ secrets.DOCKER_USERNAME }}/team:latest
             # 3. docker-compose.yml을 기반으로 기존 컨테이너를 중지/삭제합니다.
-            sudo docker compose down
+            sudo docker compose down -v
             # 4. docker-compose.yml을 기반으로 새 컨테이너를 백그라운드에서 시작합니다.
             sudo docker compose up -d
             # 5. 사용하지 않는 Docker 이미지를 정리합니다.
