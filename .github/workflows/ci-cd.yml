@@ -62,7 +62,7 @@ jobs:
         tags: ${{ secrets.DOCKER_USERNAME }}/team:latest
 
     - name: 산출물 업로드
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v4
       with:
         name: deploy-files
         path: |
