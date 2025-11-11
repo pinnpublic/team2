@@ -22,7 +22,7 @@ services:
       - "1521:1521"
     shm_size: '1g'
     healthcheck: # <-- (필수) 이 healthcheck 블록을 추가합니다.
-      test: ["CMD", "healthcheck.sh"]
+      test: ["CMD-SHELL", "echo 'SELECT 1 FROM DUAL;' | sqlplus -s $APP_USER/$APP_USER_PASSWORD@localhost:1521/XEPDB1 || exit 1"]
       interval: 10s # 10초마다 헬스체크
       timeout: 5s   # 5초 내 응답
       retries: 30 # 30번 재시도 (최대 5분간 기다림)
